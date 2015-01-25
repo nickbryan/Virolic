@@ -1,0 +1,8 @@
+[
+    "src/system/window.js",
+    "src/system/polyfill.js",
+    "src/debug/debugpanel.js",
+    "src/system/timer.js",
+    "src/game.js",
+    "src/gamestate/gamestate.js"
+]
