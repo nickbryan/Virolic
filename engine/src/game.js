@@ -8,7 +8,7 @@
 
         function gameLoop(time) {
             publicApi.update(time);
-            publicApi.render();
+            publicApi.render(time);
 
             if (settings.animationFrameId !== -1) {
                 settings.animationFrameId = window.requestAnimationFrame(gameLoop);

@@ -2,6 +2,11 @@ html, body {
     height: 100%
 }
 
+#game-screen {
+    width: 70%;
+    float: left;
+}
+
 #debug-panel {
     display: inline-block;
     width: 25%;
@@ -20,3 +25,5 @@ html, body {
 .debug-button {
     background-color: #374e0c;
 }
+
+canvas { border: 1px solid black; }

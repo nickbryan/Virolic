@@ -1,3 +1,4 @@
 npm-debug.log
 engine/node_modules
 .idea
+.DS_Store
