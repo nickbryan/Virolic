@@ -70,6 +70,168 @@
         };
     }
 })();
+
+/*
+ * Copyright (c) 2014, Jay Oster
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/**
+ * Extend a class prototype with the provided mixin descriptors.
+ * Designed as a faster replacement for John Resig's Simple Inheritance.
+ * @name extend
+ * @memberOf external:Object#
+ * @function
+ * @param {Object[]} mixins... Each mixin is a dictionary of functions, or a
+ * previously extended class whose methods will be applied to the target class
+ * prototype.
+ * @return {Object}
+ * @example
+ * var Person = Object.extend({
+ *     "init" : function(isDancing) {
+ *         this.dancing = isDancing;
+ *     },
+ *     "dance" : function() {
+ *         return this.dancing;
+ *     }
+ * });
+ *
+ * var Ninja = Person.extend({
+ *     "init" : function() {
+ *         // Call the super constructor, passing a single argument
+ *         this._super(Person, "init", [ false ]);
+ *     },
+ *     "dance" : function() {
+ *         // Call the overridden dance() method
+ *         return this._super(Person, "dance");
+ *     },
+ *     "swingSword" : function() {
+ *         return true;
+ *     }
+ * });
+ *
+ * var Pirate = Person.extend(Ninja, {
+ *     "init" : function() {
+ *         // Call the super constructor, passing a single argument
+ *         this._super(Person, "init", [ true ]);
+ *     }
+ * });
+ *
+ * var p = new Person(true);
+ * console.log(p.dance()); // => true
+ *
+ * var n = new Ninja();
+ * console.log(n.dance()); // => false
+ * console.log(n.swingSword()); // => true
+ *
+ * var r = new Pirate();
+ * console.log(r.dance()); // => true
+ * console.log(r.swingSword()); // => true
+ *
+ * console.log(
+ *     p instanceof Person &&
+ *     n instanceof Ninja &&
+ *     n instanceof Person &&
+ *     r instanceof Pirate &&
+ *     r instanceof Person
+ * ); // => true
+ *
+ * console.log(r instanceof Ninja); // => false
+ */
+(function () {
+    Object.defineProperty(Object.prototype, "extend", {
+        "value" : function () {
+            var methods = {};
+            var mixins = Array.prototype.slice.call(arguments, 0);
+
+            /**
+             * The class constructor which creates the `_super` shortcut method
+             * and calls the user `init` constructor if defined.
+             * @ignore
+             */
+            function Class() {
+                // Call the user constructor
+                this.init.apply(this, arguments);
+                return this;
+            }
+
+            // Apply superClass
+            Class.prototype = Object.create(this.prototype);
+
+            // Apply all mixin methods to the class prototype
+            mixins.forEach(function (mixin) {
+                apply_methods(Class, methods, mixin.__methods__ || mixin);
+            });
+
+            // Verify constructor exists
+            if (!("init" in Class.prototype)) {
+                throw "Object.extend: Class is missing a constructor named `init`";
+            }
+
+            // Apply syntactic sugar for accessing methods on super classes
+            Object.defineProperty(Class.prototype, "_super", {
+                "value" : _super
+            });
+
+            // Create a hidden property on the class itself
+            // List of methods, used for applying classes as mixins
+            Object.defineProperty(Class, "__methods__", {
+                "value" : methods
+            });
+
+            return Class;
+        }
+    });
+
+    /**
+     * Apply methods to the class prototype.
+     * @ignore
+     */
+    function apply_methods(Class, methods, descriptor) {
+        Object.keys(descriptor).forEach(function (method) {
+            methods[method] = descriptor[method];
+
+            if (typeof(descriptor[method]) !== "function") {
+                throw "Object.extend: Method `" + method + "` is not a function!";
+            }
+
+            Object.defineProperty(Class.prototype, method, {
+                "configurable" : true,
+                "value" : descriptor[method]
+            });
+        });
+    }
+
+    /**
+     * Special method that acts as a proxy to the super class.
+     * @name _super
+     * @ignore
+     */
+    function _super(superClass, method, args) {
+        return superClass.prototype[method].apply(this, args);
+    };
+})();
 (function() {
     opus.debug = (function() {
         /**
@@ -296,46 +458,31 @@
         var publicApi = {};
 
         var settings = {
-            animationFrameId: -1
         };
 
-        function gameLoop(time) {
-            publicApi.update(time);
-            publicApi.render(time);
-
-            if (settings.animationFrameId !== -1) {
-                settings.animationFrameId = window.requestAnimationFrame(gameLoop);
-            }
-        }
+        publicApi.init = function() {
+            opus.timer.init();
+        };
 
         publicApi.update = function(time) {
             opus.timer.update(time);
-            opus.timer.countFps();
-            settings.fps = opus.timer.fps;
-            settings.delta = opus.timer.getDeltaTime();
-            settings.timeElapsed = opus.timer.getTimeElapsed();
-            opus.debug.update(settings);
+
+            if (opus.input.isKeyPressed("forward")) {
+                console.log('forward');
+            }
+            if (opus.input.isKeyPressed("left")) {
+                console.log('left');
+            }
+            if (opus.input.isKeyPressed("down")) {
+                console.log('down');
+            }
+            if (opus.input.isKeyPressed("right")) {
+                console.log('right');
+            }
         };
 
         publicApi.render = function() {
 
-        };
-
-        publicApi.startGameLoop = function() {
-            // Check that the loop hasn't already been started
-            if (settings.animationFrameId === -1) {
-                settings.animationFrameId = window.requestAnimationFrame(gameLoop);
-            }
-        }
-
-        publicApi.stopGameLoop = function() {
-            window.cancelAnimationFrame(settings.animationFrameId);
-            settings.animationFrameId = -1;
-        }
-
-        publicApi.init = function() {
-            opus.timer.init();
-            opus.debug.drawDebugPanel();
         };
 
         return publicApi;
@@ -378,8 +525,77 @@
     })();
 })();
 (function() {
+    opus.gamescreen = Object.extend({
+        init: function() {
+            // Not sure what to do with this yet
+        },
 
-});
+        reset: function() {
+            this.onReset();
+        },
+
+        onReset: function() {
+            // Extend this
+        }
+    });
+})();
+(function() {
+    opus.gamestate = (function () {
+        var publicApi = {};
+
+        var animationFrameId = -1;
+
+        var currentState = -1;
+
+        var gameScreens = {};
+
+        function gameLoop(time) {
+            opus.game.update(time);
+            opus.game.render(time);
+
+            if (animationFrameId !== -1) {
+                animationFrameId = window.requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function startGameLoop() {
+            // Check that the loop hasn't already been started
+            if (animationFrameId === -1) {
+                animationFrameId = window.requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function stopGameLoop() {
+            window.cancelAnimationFrame(animationFrameId);
+            animationFrameId = -1;
+        }
+
+        publicApi.PLAY = 0;
+
+        publicApi.setGameState = function(gameState, gameScreen) {
+            gameScreens[gameState] = {};
+            gameScreens[gameState].screen = gameScreen;
+        };
+
+        publicApi.changeGameState = function(state) {
+            stopGameLoop();
+
+            if (gameScreens[currentState]) {
+                // remove current state
+            }
+
+            if (gameScreens[state]) {
+                currentState = state;
+
+                gameScreens[currentState].screen.reset;
+
+                startGameLoop();
+            }
+        };
+
+        return publicApi;
+    })();
+})();;
 (function() {
 
     opus.input = (function() {
@@ -393,9 +609,11 @@
 (function() {
     var input = opus.input;
 
-    input.boundKeys = {};
+    var boundKeys = {};
 
-    input.keyboardInitialised = false;
+    var keyboardInitialised = false;
+
+    var keyStatus = {};
 
     input.KEY = {
         "BACKSPACE": 8,
@@ -499,26 +717,41 @@
     };
 
     input.bindKey = function(keyCode, action) {
-        console.log("gotbindkey");
-        input.enableKeyboadEvent()
-        input.boundKeys[keyCode] = action;
+        input.enableKeyboadEvent();
+        boundKeys[keyCode] = action;
+        keyStatus[action] = false;
     };
 
     input.enableKeyboadEvent = function() {
-        console.log("gotenable");
-        if (!input.keyboardInitialised) {
+        if (!keyboardInitialised) {
             window.addEventListener("keydown", input.keyDown, false);
-            //window.addEventListener(("keyup", input.keyUp, false))
+            window.addEventListener("keyup", input.keyUp, false);
+            keyboardInitialised = true;
         }
     };
 
     input.keyDown = function(e, keyCode, mouseButton) {
-        console.log("gotkeydown");
         keyCode = keyCode || e.keyCode || e.which;
-        var action = input.boundKeys[keyCode];
+        var action = boundKeys[keyCode];
 
-        console.log(e);
-        console.log(keyCode);
-        console.log(action);
+        keyStatus[action] = true;
+
+        return true;
+    };
+
+    input.keyUp = function(e, keyCode, mouseButton) {
+        keyCode = keyCode || e.keyCode || e.which;
+        var action = boundKeys[keyCode];
+
+        keyStatus[action] = false;
+
+        return true;
+    };
+
+    input.isKeyPressed = function(action) {
+        if (keyStatus[action]) {
+            return true;
+        }
+        return false;
     };
 })();

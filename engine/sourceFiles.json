@@ -5,6 +5,7 @@
     "src/system/timer.js",
     "src/game.js",
     "src/graphics/renderer.js",
+    "src/gamestate/gamescreen.js",
     "src/gamestate/gamestate.js",
     "src/input/input.js",
     "src/input/keyboard.js"

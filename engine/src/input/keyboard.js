@@ -1,9 +1,11 @@
 (function() {
     var input = opus.input;
 
-    input.boundKeys = {};
+    var boundKeys = {};
 
-    input.keyboardInitialised = false;
+    var keyboardInitialised = false;
+
+    var keyStatus = {};
 
     input.KEY = {
         "BACKSPACE": 8,
@@ -107,26 +109,41 @@
     };
 
     input.bindKey = function(keyCode, action) {
-        console.log("gotbindkey");
-        input.enableKeyboadEvent()
-        input.boundKeys[keyCode] = action;
+        input.enableKeyboadEvent();
+        boundKeys[keyCode] = action;
+        keyStatus[action] = false;
     };
 
     input.enableKeyboadEvent = function() {
-        console.log("gotenable");
-        if (!input.keyboardInitialised) {
+        if (!keyboardInitialised) {
             window.addEventListener("keydown", input.keyDown, false);
-            //window.addEventListener(("keyup", input.keyUp, false))
+            window.addEventListener("keyup", input.keyUp, false);
+            keyboardInitialised = true;
         }
     };
 
     input.keyDown = function(e, keyCode, mouseButton) {
-        console.log("gotkeydown");
         keyCode = keyCode || e.keyCode || e.which;
-        var action = input.boundKeys[keyCode];
+        var action = boundKeys[keyCode];
 
-        console.log(e);
-        console.log(keyCode);
-        console.log(action);
+        keyStatus[action] = true;
+
+        return true;
+    };
+
+    input.keyUp = function(e, keyCode, mouseButton) {
+        keyCode = keyCode || e.keyCode || e.which;
+        var action = boundKeys[keyCode];
+
+        keyStatus[action] = false;
+
+        return true;
+    };
+
+    input.isKeyPressed = function(action) {
+        if (keyStatus[action]) {
+            return true;
+        }
+        return false;
     };
 })();
