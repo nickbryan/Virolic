@@ -4,9 +4,14 @@
     "src/debug/debugpanel.js",
     "src/system/timer.js",
     "src/game.js",
+    "src/math/vector2d.js",
+    "src/graphics/shapes/rectangle.js",
+    "src/graphics/renderable.js",
     "src/graphics/renderer.js",
+    "src/system/container.js",
     "src/gamestate/gamescreen.js",
     "src/gamestate/gamestate.js",
     "src/input/input.js",
-    "src/input/keyboard.js"
+    "src/input/keyboard.js",
+    "src/entity/blob.js"
 ]

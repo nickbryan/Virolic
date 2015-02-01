@@ -14,7 +14,7 @@
 
             context =  canvas.getContext('2d');
 
-            opus.game.init();
+            opus.game.init(screen_width, screen_height);
 
             return true;
         };
@@ -29,6 +29,17 @@
             _canvas.height = height || canvas.height;
 
             return _canvas;
+        };
+
+        publicApi.clearScreen = function() {
+            context.save();
+            context.setTransform(1, 0, 0, 1, 0, 0);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.restore();
+        };
+
+        publicApi.getContext = function() {
+            return context;
         };
 
         return publicApi;

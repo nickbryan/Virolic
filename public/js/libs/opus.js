@@ -457,36 +457,100 @@
     opus.game = (function() {
         var publicApi = {};
 
-        var settings = {
-        };
+        var initialised = false;
 
-        publicApi.init = function() {
-            opus.timer.init();
+        publicApi.gameWorld = null;
+
+        publicApi.init = function (width, height) {
+            if (initialised === false) {
+                publicApi.gameWorld = new opus.Container(0, 0, width, height);
+
+                opus.timer.init();
+            }
         };
 
         publicApi.update = function(time) {
             opus.timer.update(time);
 
-            if (opus.input.isKeyPressed("forward")) {
-                console.log('forward');
-            }
-            if (opus.input.isKeyPressed("left")) {
-                console.log('left');
-            }
-            if (opus.input.isKeyPressed("down")) {
-                console.log('down');
-            }
-            if (opus.input.isKeyPressed("right")) {
-                console.log('right');
-            }
+            publicApi.gameWorld.update(time);
         };
 
         publicApi.render = function() {
+            opus.renderer.clearScreen();
 
+            publicApi.gameWorld.render(opus.renderer.getContext());
         };
 
         return publicApi;
     })();
+})();
+(function() {
+    opus.vector2d = Object.extend({
+       init: function(x, y) {
+            return this.set(x || 0, y || 0);
+       },
+
+       set: function(x, y) {
+           if (isNaN(x)) {
+               throw new Error("Invalid x parameter for vector");
+           }
+           if (isNaN(y)) {
+               throw new Error("Invalid y parameter for vector");
+           }
+
+           this.x = x;
+
+           this.y = y;
+
+           return this;
+       }
+    });
+})();
+(function() {
+    opus.Rectangle = Object.extend({
+        init: function(xPos, yPos, width, height) {
+            this.position = new opus.vector2d(xPos, yPos);
+
+            this.width = width;
+
+            this.height = height;
+        },
+
+        set: function(xPos, yPos, width, height) {
+            this.position.set(xPos, yPos);
+
+            this.resize(width, height);
+
+            return this;
+        },
+
+        resize: function(width, height) {
+            this.width = width;
+            this.height = height;
+            return this;
+        },
+
+        getBounds: function() {
+            return this;
+        }
+    });
+})();
+(function() {
+    opus.Renderable = opus.Rectangle.extend({
+        init: function(xPos, yPos, width, height) {
+            this.zIndex = NaN;
+
+            this._super(opus.Rectangle, 'init', [xPos, yPos, width, height]);
+        },
+
+        update: function() {
+            // Extend this
+        },
+
+        render: function() {
+            // Extend this
+        }
+    });
 })();
 (function() {
     opus.renderer = (function() {
@@ -504,7 +568,7 @@
 
             context =  canvas.getContext('2d');
 
-            opus.game.init();
+            opus.game.init(screen_width, screen_height);
 
             return true;
         };
@@ -521,8 +585,54 @@
             return _canvas;
         };
 
+        publicApi.clearScreen = function() {
+            context.save();
+            context.setTransform(1, 0, 0, 1, 0, 0);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.restore();
+        };
+
+        publicApi.getContext = function() {
+            return context;
+        };
+
         return publicApi;
     })();
+})();
+(function() {
+    opus.Container = opus.Renderable.extend({
+        init: function(posX, posY, width, height) {
+            this._super(opus.Renderable, 'init', [posX, posY, width || Infinity, height || Infinity]);
+
+            this.containedElements = [];
+        },
+
+        addElement: function(element, zIndex) {
+            if (typeof zIndex === 'number') {
+                element.zIndex = zIndex;
+            }
+
+            if (typeof element.zIndex === 'undefined') {
+                element.zIndex = this.containedElements.length;
+            }
+
+            this.containedElements.push(element);
+
+            return element;
+        },
+
+        update: function(deltaTime) {
+            for (var i = this.containedElements.length, obj; i--, (obj = this.containedElements[i]);) {
+                obj.update(deltaTime);
+            }
+        },
+
+        render: function(renderer) {
+            for (var i = this.containedElements.length, obj; i--, (obj = this.containedElements[i]);) {
+                obj.draw(renderer);
+            }
+        }
+    });
 })();
 (function() {
     opus.gamescreen = Object.extend({
@@ -754,4 +864,30 @@
         }
         return false;
     };
+})();
+(function() {
+    opus.blob = opus.Renderable.extend({
+        init: function(x, y, width, height) {
+            this._super(opus.Renderable, "init", [x, y, width, height]);
+        },
+
+        draw: function(renderer) {
+            renderer.fillRect(this.position.x, this.position.y, this.width, this.height);
+        },
+
+        update: function(dt) {
+            if (opus.input.isKeyPressed("forward")) {
+                this.position.y--;
+            }
+            if (opus.input.isKeyPressed("left")) {
+                this.position.x--;
+            }
+            if (opus.input.isKeyPressed("down")) {
+                this.position.y++;
+            }
+            if (opus.input.isKeyPressed("right")) {
+                this.position.x++;
+            }
+        }
+    });
 })();

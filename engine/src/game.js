@@ -2,32 +2,28 @@
     opus.game = (function() {
         var publicApi = {};
 
-        var settings = {
-        };
+        var initialised = false;
 
-        publicApi.init = function() {
-            opus.timer.init();
+        publicApi.gameWorld = null;
+
+        publicApi.init = function (width, height) {
+            if (initialised === false) {
+                publicApi.gameWorld = new opus.Container(0, 0, width, height);
+
+                opus.timer.init();
+            }
         };
 
         publicApi.update = function(time) {
             opus.timer.update(time);
 
-            if (opus.input.isKeyPressed("forward")) {
-                console.log('forward');
-            }
-            if (opus.input.isKeyPressed("left")) {
-                console.log('left');
-            }
-            if (opus.input.isKeyPressed("down")) {
-                console.log('down');
-            }
-            if (opus.input.isKeyPressed("right")) {
-                console.log('right');
-            }
+            publicApi.gameWorld.update(time);
         };
 
         publicApi.render = function() {
+            opus.renderer.clearScreen();
 
+            publicApi.gameWorld.render(opus.renderer.getContext());
         };
 
         return publicApi;
