@@ -478,6 +478,9 @@
         publicApi.render = function() {
             opus.renderer.clearScreen();
 
+            var img = opus.assetmanager.getImage('Map1');
+            opus.renderer.getContext().drawImage(img,0,0);
+
             publicApi.gameWorld.render(opus.renderer.getContext());
         };
 
@@ -486,6 +489,7 @@
 })();
 (function() {
     opus.vector2d = Object.extend({
+
        init: function(x, y) {
             return this.set(x || 0, y || 0);
        },
@@ -877,17 +881,49 @@
 
         update: function(dt) {
             if (opus.input.isKeyPressed("forward")) {
-                this.position.y--;
+                if (this.position.y > opus.game.gameWorld.position.y)
+                this.position.y -= 3;
             }
             if (opus.input.isKeyPressed("left")) {
-                this.position.x--;
+                if (this.position.x > opus.game.gameWorld.position.x)
+                this.position.x -= 3;
             }
             if (opus.input.isKeyPressed("down")) {
-                this.position.y++;
+                if (this.position.y < opus.game.gameWorld.height - this.height)
+                this.position.y += 3;
             }
             if (opus.input.isKeyPressed("right")) {
-                this.position.x++;
+                if (this.position.x < opus.game.gameWorld.width - this.width)
+                this.position.x += 3;
             }
+
+            console.log("x " + this.position.x + " y " + this.position.y + ' gamew ' + opus.game.gameWorld.width + ' gameh ' + opus.game.gameWorld.height);
         }
     });
+})();
+(function() {
+    opus.assetmanager = (function() {
+        var publicApi = {};
+
+        var loadedImages = {};
+
+        publicApi.loadImage = function (name, imageSource) {
+            loadedImages[name] = new Image();
+            loadedImages[name].src = imageSource;
+        };
+
+        publicApi.loadedImages = function() {
+            console.log(loadedImages);
+        };
+
+        publicApi.getImage = function(image) {
+            if (image in loadedImages) {
+                return loadedImages[image];
+            } else {
+                return null;
+            }
+        }
+
+        return publicApi;
+    })();
 })();

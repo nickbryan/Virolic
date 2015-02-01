@@ -10,17 +10,23 @@
 
         update: function(dt) {
             if (opus.input.isKeyPressed("forward")) {
-                this.position.y--;
+                if (this.position.y > opus.game.gameWorld.position.y)
+                this.position.y -= 3;
             }
             if (opus.input.isKeyPressed("left")) {
-                this.position.x--;
+                if (this.position.x > opus.game.gameWorld.position.x)
+                this.position.x -= 3;
             }
             if (opus.input.isKeyPressed("down")) {
-                this.position.y++;
+                if (this.position.y < opus.game.gameWorld.height - this.height)
+                this.position.y += 3;
             }
             if (opus.input.isKeyPressed("right")) {
-                this.position.x++;
+                if (this.position.x < opus.game.gameWorld.width - this.width)
+                this.position.x += 3;
             }
+
+            console.log("x " + this.position.x + " y " + this.position.y + ' gamew ' + opus.game.gameWorld.width + ' gameh ' + opus.game.gameWorld.height);
         }
     });
 })();

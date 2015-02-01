@@ -11,10 +11,9 @@
             opus.input.bindKey(opus.input.KEY.D, "right");
 
             opus.game.gameWorld.addElement(new opus.blob(350, 100, 20, 20));
-            opus.game.gameWorld.addElement(new opus.blob(100, 20, 20, 20));
-            opus.game.gameWorld.addElement(new opus.blob(40, 400, 40, 30));
-            opus.game.gameWorld.addElement(new opus.blob(500, 50, 10, 50));
-            opus.game.gameWorld.addElement(new opus.blob(60, 60, 20, 20));
+
+            opus.assetmanager.loadImage('Map1', './js/resources/map1_tileset.png');
+            opus.assetmanager.loadedImages();
 
             opus.gamestate.setGameState(opus.gamestate.PLAY, new game.PlayScreen());
             opus.gamestate.changeGameState(opus.gamestate.PLAY);
