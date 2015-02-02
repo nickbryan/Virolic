@@ -27,6 +27,8 @@
             opus.renderer.getContext().drawImage(img,0,0);
 
             publicApi.gameWorld.render(opus.renderer.getContext());
+
+            opus.renderer.drawFrontBuffer();
         };
 
         return publicApi;

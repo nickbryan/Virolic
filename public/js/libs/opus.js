@@ -482,6 +482,8 @@
             opus.renderer.getContext().drawImage(img,0,0);
 
             publicApi.gameWorld.render(opus.renderer.getContext());
+
+            opus.renderer.drawFrontBuffer();
         };
 
         return publicApi;
@@ -563,14 +565,18 @@
         var canvas = null;
         var wrapper = null;
         var context = null;
+        var backBuffer = null;
+        var backBufferContext = null;
 
         publicApi.init = function(screen_width, screen_height) {
             canvas = publicApi.createCanvas(screen_width, screen_height);
+            backBuffer = publicApi.createCanvas(screen_width, screen_height);
 
             wrapper = document.getElementById('game-screen');
             wrapper.appendChild(canvas);
 
             context =  canvas.getContext('2d');
+            backBufferContext =  backBuffer.getContext('2d');
 
             opus.game.init(screen_width, screen_height);
 
@@ -590,14 +596,19 @@
         };
 
         publicApi.clearScreen = function() {
-            context.save();
-            context.setTransform(1, 0, 0, 1, 0, 0);
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.restore();
+            backBufferContext.save();
+            backBufferContext.setTransform(1, 0, 0, 1, 0, 0);
+            backBufferContext.fillStyle = 'white';
+            backBufferContext.fillRect(0, 0, canvas.width, canvas.height);
+            backBufferContext.restore();
         };
 
         publicApi.getContext = function() {
-            return context;
+            return backBufferContext;
+        };
+
+        publicApi.drawFrontBuffer = function() {
+            context.drawImage(backBuffer, 0, 0);
         };
 
         return publicApi;
@@ -882,19 +893,19 @@
         update: function(dt) {
             if (opus.input.isKeyPressed("forward")) {
                 if (this.position.y > opus.game.gameWorld.position.y)
-                this.position.y -= 3;
+                this.position.y--;
             }
             if (opus.input.isKeyPressed("left")) {
                 if (this.position.x > opus.game.gameWorld.position.x)
-                this.position.x -= 3;
+                this.position.x--;
             }
             if (opus.input.isKeyPressed("down")) {
                 if (this.position.y < opus.game.gameWorld.height - this.height)
-                this.position.y += 3;
+                this.position.y++;
             }
             if (opus.input.isKeyPressed("right")) {
                 if (this.position.x < opus.game.gameWorld.width - this.width)
-                this.position.x += 3;
+                this.position.x++;
             }
 
             console.log("x " + this.position.x + " y " + this.position.y + ' gamew ' + opus.game.gameWorld.width + ' gameh ' + opus.game.gameWorld.height);

@@ -11,6 +11,7 @@
             opus.input.bindKey(opus.input.KEY.D, "right");
 
             opus.game.gameWorld.addElement(new opus.blob(350, 100, 20, 20));
+            opus.game.gameWorld.addElement(new opus.blob(400, 100, 20, 20));
 
             opus.assetmanager.loadImage('Map1', './js/resources/map1_tileset.png');
             opus.assetmanager.loadedImages();

@@ -5,14 +5,18 @@
         var canvas = null;
         var wrapper = null;
         var context = null;
+        var backBuffer = null;
+        var backBufferContext = null;
 
         publicApi.init = function(screen_width, screen_height) {
             canvas = publicApi.createCanvas(screen_width, screen_height);
+            backBuffer = publicApi.createCanvas(screen_width, screen_height);
 
             wrapper = document.getElementById('game-screen');
             wrapper.appendChild(canvas);
 
             context =  canvas.getContext('2d');
+            backBufferContext =  backBuffer.getContext('2d');
 
             opus.game.init(screen_width, screen_height);
 
@@ -32,14 +36,19 @@
         };
 
         publicApi.clearScreen = function() {
-            context.save();
-            context.setTransform(1, 0, 0, 1, 0, 0);
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.restore();
+            backBufferContext.save();
+            backBufferContext.setTransform(1, 0, 0, 1, 0, 0);
+            backBufferContext.fillStyle = 'white';
+            backBufferContext.fillRect(0, 0, canvas.width, canvas.height);
+            backBufferContext.restore();
         };
 
         publicApi.getContext = function() {
-            return context;
+            return backBufferContext;
+        };
+
+        publicApi.drawFrontBuffer = function() {
+            context.drawImage(backBuffer, 0, 0);
         };
 
         return publicApi;
