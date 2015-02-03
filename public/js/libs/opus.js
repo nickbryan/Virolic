@@ -567,16 +567,23 @@
         var context = null;
         var backBuffer = null;
         var backBufferContext = null;
+        var useDoubleBuffering = false;
 
         publicApi.init = function(screen_width, screen_height) {
             canvas = publicApi.createCanvas(screen_width, screen_height);
-            backBuffer = publicApi.createCanvas(screen_width, screen_height);
 
             wrapper = document.getElementById('game-screen');
             wrapper.appendChild(canvas);
 
             context =  canvas.getContext('2d');
-            backBufferContext =  backBuffer.getContext('2d');
+
+            if (useDoubleBuffering) {
+                backBuffer = publicApi.createCanvas(screen_width, screen_height);
+                backBufferContext = backBuffer.getContext('2d');
+            } else {
+                backBuffer = canvas;
+                backBufferContext = context;
+            }
 
             opus.game.init(screen_width, screen_height);
 
