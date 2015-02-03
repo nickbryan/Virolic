@@ -590,6 +590,10 @@
             return true;
         };
 
+        publicApi.setBuffer = function(useBufferering) {
+            useDoubleBuffering = useBufferering;
+        };
+
         publicApi.createCanvas = function(width, height) {
             if (width == 0 || height == 0) {
                 console.log("Width and height need to be greater than zero for canvas creation.")
