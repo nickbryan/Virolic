@@ -32,7 +32,7 @@
 
         publicApi.setBuffer = function(useBufferering) {
             useDoubleBuffering = useBufferering;
-        }
+        };
 
         publicApi.createCanvas = function(width, height) {
             if (width == 0 || height == 0) {
