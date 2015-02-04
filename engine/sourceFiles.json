@@ -14,5 +14,6 @@
     "src/input/input.js",
     "src/input/keyboard.js",
     "src/entity/blob.js",
-    "src/system/assetmanager.js"
+    "src/system/assetmanager.js",
+    "src/level/level.js"
 ]

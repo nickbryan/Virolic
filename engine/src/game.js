@@ -23,9 +23,7 @@
         publicApi.render = function() {
             opus.renderer.clearScreen();
 
-            var img = opus.assetmanager.getImage('Map1');
-            opus.renderer.getContext().drawImage(img,0,0);
-
+            opus.level.draw(opus.renderer.getContext());
             publicApi.gameWorld.render(opus.renderer.getContext());
 
             opus.renderer.drawFrontBuffer();

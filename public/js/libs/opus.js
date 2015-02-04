@@ -478,9 +478,7 @@
         publicApi.render = function() {
             opus.renderer.clearScreen();
 
-            var img = opus.assetmanager.getImage('Map1');
-            opus.renderer.getContext().drawImage(img,0,0);
-
+            opus.level.draw(opus.renderer.getContext());
             publicApi.gameWorld.render(opus.renderer.getContext());
 
             opus.renderer.drawFrontBuffer();
@@ -919,7 +917,7 @@
                 this.position.x++;
             }
 
-            console.log("x " + this.position.x + " y " + this.position.y + ' gamew ' + opus.game.gameWorld.width + ' gameh ' + opus.game.gameWorld.height);
+            //console.log("x " + this.position.x + " y " + this.position.y + ' gamew ' + opus.game.gameWorld.width + ' gameh ' + opus.game.gameWorld.height);
         }
     });
 })();
@@ -928,6 +926,7 @@
         var publicApi = {};
 
         var loadedImages = {};
+        var loadedJSON = {};
 
         publicApi.loadImage = function (name, imageSource) {
             loadedImages[name] = new Image();
@@ -944,7 +943,62 @@
             } else {
                 return null;
             }
-        }
+        };
+
+        publicApi.loadJSON = function (name, source) {
+            var xmlhttp = new XMLHttpRequest();
+
+            if (xmlhttp.overrideMimeType) {
+                xmlhttp.overrideMimeType("application/json");
+            }
+
+            xmlhttp.open("GET", source, true);
+
+            // set the callbacks
+            xmlhttp.ontimeout = onerror;
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4) {
+                    // status = 0 when file protocol is used, or cross-domain origin,
+                    // (With Chrome use "--allow-file-access-from-files --disable-web-security")
+                    if ((xmlhttp.status === 200) || ((xmlhttp.status === 0) && xmlhttp.responseText)) {
+                        // get the Texture Packer Atlas content
+                        loadedJSON[name] = JSON.parse(xmlhttp.responseText);
+                        // fire the callback
+                        //onload();
+                    }
+                    else {
+                        //onerror();
+                    }
+                }
+            };
+            // send the request
+            xmlhttp.send(null);
+        };
+
+        publicApi.getJSON = function(json) {
+            if (json in loadedJSON) {
+                return loadedJSON[json];
+            } else {
+                return null;
+            }
+        };
+
+        return publicApi;
+    })();
+})();
+(function() {
+
+    opus.level = (function() {
+        var publicApi = {};
+        var levelSprite = null;
+
+        publicApi.init = function() {
+            levelSprite = opus.assetmanager.getImage('Map1');
+        };
+
+        publicApi.draw = function(renderer) {
+            renderer.drawImage(levelSprite, 0, 0, 32, 32, 0, 0, 32, 32);
+        };
 
         return publicApi;
     })();

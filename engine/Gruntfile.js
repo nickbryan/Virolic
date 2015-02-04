@@ -5,6 +5,15 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
+        copy: {
+            main: {
+                files: [
+                    // includes files within path
+                    {expand: true, cwd: '../public/', src: ['**'], dest: '../../../../../Sites/BrowserGame/public/', filter: 'isFile'}
+                ]
+            }
+        },
+
         concat: {
             dist: {
                 src: sourceFiles,
@@ -14,6 +23,7 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask('default', ['concat']);
+    grunt.registerTask('default', ['concat', 'copy']);
 };
