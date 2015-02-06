@@ -3,10 +3,14 @@
         var publicApi = {};
 
         var initialised = false;
+        publicApi.screen_width = 0;
+        publicApi.screen_height = 0;
 
         publicApi.gameWorld = null;
 
         publicApi.init = function (width, height) {
+            publicApi.screen_width = width;
+            publicApi.screen_height = height;
             if (initialised === false) {
                 publicApi.gameWorld = new opus.Container(0, 0, width, height);
 

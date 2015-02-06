@@ -9,7 +9,11 @@
         };
 
         publicApi.draw = function(renderer) {
-            renderer.drawImage(levelSprite, 0, 0, 32, 32, 0, 0, 32, 32);
+            for (var y = 0; y < opus.game.screen_height / 32; y++) {
+                for (var x = 0; x < opus.game.screen_width / 32; x++) {
+                    renderer.drawImage(levelSprite, 0, 0, 32, 32, 0 + 32 * x, 0 + 32 * y, 32, 32);
+                }
+            }
         };
 
         return publicApi;

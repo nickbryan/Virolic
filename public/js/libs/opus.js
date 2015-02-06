@@ -458,10 +458,14 @@
         var publicApi = {};
 
         var initialised = false;
+        publicApi.screen_width = 0;
+        publicApi.screen_height = 0;
 
         publicApi.gameWorld = null;
 
         publicApi.init = function (width, height) {
+            publicApi.screen_width = width;
+            publicApi.screen_height = height;
             if (initialised === false) {
                 publicApi.gameWorld = new opus.Container(0, 0, width, height);
 
@@ -997,7 +1001,11 @@
         };
 
         publicApi.draw = function(renderer) {
-            renderer.drawImage(levelSprite, 0, 0, 32, 32, 0, 0, 32, 32);
+            for (var y = 0; y < opus.game.screen_height / 32; y++) {
+                for (var x = 0; x < opus.game.screen_width / 32; x++) {
+                    renderer.drawImage(levelSprite, 0, 0, 32, 32, 0 + 32 * x, 0 + 32 * y, 32, 32);
+                }
+            }
         };
 
         return publicApi;
