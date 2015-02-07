@@ -25,8 +25,6 @@
                 if (this.position.x < opus.game.gameWorld.width - this.width)
                 this.position.x++;
             }
-
-            //console.log("x " + this.position.x + " y " + this.position.y + ' gamew ' + opus.game.gameWorld.width + ' gameh ' + opus.game.gameWorld.height);
         }
     });
 })();

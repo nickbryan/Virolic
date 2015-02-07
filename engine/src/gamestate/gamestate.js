@@ -46,7 +46,7 @@
             if (gameScreens[state]) {
                 currentState = state;
 
-                gameScreens[currentState].screen.reset;
+                gameScreens[currentState].screen.reset();
 
                 startGameLoop();
             }
