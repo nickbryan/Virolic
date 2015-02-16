@@ -10,12 +10,12 @@
             mapData = opus.assetmanager.getJSON("Map");
             layers = mapData.layers;
 
-            var test = 3;
+            var test = 0;
             for (var i = 0; i < 4; i++) {
                 if (test == 0) {
                     opus.game.gameWorld.addElement(new opus.layer(
                         opus.assetmanager.getImage("Grass"),
-                        layers[test],
+                        layers[i],
                         mapData.tilewidth,
                         mapData.tileheight,
                         mapData.width,
@@ -27,7 +27,7 @@
                 } else {
                     opus.game.gameWorld.addElement(new opus.layer(
                         opus.assetmanager.getImage("MainTileSet"),
-                        layers[test],
+                        layers[i],
                         mapData.tilewidth,
                         mapData.tileheight,
                         mapData.width,
@@ -38,7 +38,7 @@
                     ));
                 }
 
-                test--;
+                test++;
             }
         };
 

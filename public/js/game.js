@@ -9,9 +9,10 @@
             opus.assetmanager.loadJSON('Map', './js/resources/testmap.json');
 
             setTimeout(function() {
-                opus.renderer.init(1000,1000);
-                opus.game.gameWorld.addElement(new opus.blob(350, 100, 16, 16));
+                opus.renderer.init(800,800);
                 opus.LevelManager.init();
+
+                opus.game.gameWorld.addElement(new opus.blob(350, 100, 16, 16), 3);
 
                 opus.gamestate.setGameState(opus.gamestate.PLAY, new game.PlayScreen());
                 opus.gamestate.changeGameState(opus.gamestate.PLAY);

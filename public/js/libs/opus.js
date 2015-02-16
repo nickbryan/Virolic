@@ -635,16 +635,31 @@
             this.containedElements = [];
         },
 
+        sort: function(a, b) {
+            /* alpha sort if (a.zIndex < b.zIndex) {
+                return -1;
+            }
+            if (a.zIndex > b.zIndex) {
+                return 1;
+            }
+            return 0;*/
+
+            // Numeric Sort
+            return b.zIndex - a.zIndex;
+        },
+
         addElement: function(element, zIndex) {
+            if (typeof zIndex === 'undefined') {
+                element.zIndex = this.containedElements.length;
+            }
+
             if (typeof zIndex === 'number') {
                 element.zIndex = zIndex;
             }
 
-            if (typeof element.zIndex === 'undefined') {
-                element.zIndex = this.containedElements.length;
-            }
-
             this.containedElements.push(element);
+
+            this.containedElements.sort(this.sort);
 
             return element;
         },
@@ -1055,12 +1070,12 @@
             mapData = opus.assetmanager.getJSON("Map");
             layers = mapData.layers;
 
-            var test = 3;
+            var test = 0;
             for (var i = 0; i < 4; i++) {
                 if (test == 0) {
                     opus.game.gameWorld.addElement(new opus.layer(
                         opus.assetmanager.getImage("Grass"),
-                        layers[test],
+                        layers[i],
                         mapData.tilewidth,
                         mapData.tileheight,
                         mapData.width,
@@ -1072,7 +1087,7 @@
                 } else {
                     opus.game.gameWorld.addElement(new opus.layer(
                         opus.assetmanager.getImage("MainTileSet"),
-                        layers[test],
+                        layers[i],
                         mapData.tilewidth,
                         mapData.tileheight,
                         mapData.width,
@@ -1083,7 +1098,7 @@
                     ));
                 }
 
-                test--;
+                test++;
             }
         };
 
