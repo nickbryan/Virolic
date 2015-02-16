@@ -27,7 +27,7 @@
         publicApi.render = function() {
             opus.renderer.clearScreen();
 
-            opus.level.draw(opus.renderer.getContext());
+            //opus.level.draw(opus.renderer.getContext());
             publicApi.gameWorld.render(opus.renderer.getContext());
 
             opus.renderer.drawFrontBuffer();

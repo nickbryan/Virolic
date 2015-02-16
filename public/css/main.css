@@ -2,11 +2,6 @@ html, body {
     height: 100%
 }
 
-#game-screen {
-    width: 70%;
-    margin: 0 auto;
-}
-
 #debug-panel {
     display: inline-block;
     width: 25%;

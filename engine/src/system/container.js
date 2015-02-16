@@ -30,6 +30,10 @@
             for (var i = this.containedElements.length, obj; i--, (obj = this.containedElements[i]);) {
                 obj.draw(renderer);
             }
+        },
+
+        getContained: function() {
+            return this.containedElements;
         }
     });
 })();

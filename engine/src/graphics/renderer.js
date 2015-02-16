@@ -49,7 +49,7 @@
         publicApi.clearScreen = function() {
             backBufferContext.save();
             backBufferContext.setTransform(1, 0, 0, 1, 0, 0);
-            backBufferContext.fillStyle = 'white';
+            backBufferContext.fillStyle = 'green';
             backBufferContext.fillRect(0, 0, canvas.width, canvas.height);
             backBufferContext.restore();
         };

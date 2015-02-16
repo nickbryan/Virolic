@@ -482,7 +482,7 @@
         publicApi.render = function() {
             opus.renderer.clearScreen();
 
-            opus.level.draw(opus.renderer.getContext());
+            //opus.level.draw(opus.renderer.getContext());
             publicApi.gameWorld.render(opus.renderer.getContext());
 
             opus.renderer.drawFrontBuffer();
@@ -611,7 +611,7 @@
         publicApi.clearScreen = function() {
             backBufferContext.save();
             backBufferContext.setTransform(1, 0, 0, 1, 0, 0);
-            backBufferContext.fillStyle = 'white';
+            backBufferContext.fillStyle = 'green';
             backBufferContext.fillRect(0, 0, canvas.width, canvas.height);
             backBufferContext.restore();
         };
@@ -659,6 +659,10 @@
             for (var i = this.containedElements.length, obj; i--, (obj = this.containedElements[i]);) {
                 obj.draw(renderer);
             }
+        },
+
+        getContained: function() {
+            return this.containedElements;
         }
     });
 })();
@@ -990,19 +994,96 @@
 })();
 (function() {
 
-    opus.level = (function() {
+    opus.layer = opus.Renderable.extend({
+
+        init: function(levelSprite, layerData, tileWidth, tileHeight, width, height, offset, imageWidth, imageHeight) {
+            this._super(opus.Renderable, "init", [0, 0, width, height]);
+
+            this.imageWidth = imageWidth;
+            this.imageHeight = imageHeight;
+            this.levelSprite = levelSprite;
+            this.layerData = layerData;
+            this.tileWidth = tileWidth;
+            this.tileHeight = tileHeight;
+            this.tileSet = [];
+            this.offset = offset; ///NEEDS FIXING
+
+            this.initLevel();
+        },
+
+        initLevel: function() {
+            var columns = this.imageWidth / this.tileWidth; // 22
+            var rows = this.imageHeight / this.tileHeight;  // 18
+
+            for (var y = 0; y < rows; y++) {
+                for (var x = 0; x < columns; x++) {
+                    this.tileSet.push({
+                        pointX: x * this.tileWidth,
+                        pointY: y * this.tileHeight
+                    });
+                }
+            }
+        },
+
+        draw: function(renderer) {
+
+            var index = 0;
+            for (var mapHeight = 0; mapHeight < this.height; mapHeight++) {
+                for (var mapWidth = 0; mapWidth < this.width; mapWidth++) {
+                    var currentTile = this.layerData.data[index] - this.offset;
+                    if (currentTile >= 0) {
+                        renderer.drawImage(this.levelSprite,
+                            this.tileSet[currentTile].pointX, this.tileSet[currentTile].pointY, this.tileWidth,
+                            this.tileHeight, 0 + this.tileHeight * mapWidth, 0 + this.tileWidth * mapHeight,
+                            this.tileWidth, this.tileHeight);
+                    }
+                    index++;
+                }
+            }
+        }
+    });
+})();
+(function() {
+
+    opus.LevelManager = (function() {
         var publicApi = {};
-        var levelSprite = null;
+
+        var mapData  = null;
+        var layers = [];
 
         publicApi.init = function() {
-            levelSprite = opus.assetmanager.getImage('Map1');
-        };
+            mapData = opus.assetmanager.getJSON("Map");
+            layers = mapData.layers;
 
-        publicApi.draw = function(renderer) {
-            for (var y = 0; y < opus.game.screen_height / 32; y++) {
-                for (var x = 0; x < opus.game.screen_width / 32; x++) {
-                    renderer.drawImage(levelSprite, 0, 0, 32, 32, 0 + 32 * x, 0 + 32 * y, 32, 32);
+            var test = 3;
+            for (var i = 0; i < 4; i++) {
+                if (test == 0) {
+                    opus.game.gameWorld.addElement(new opus.layer(
+                        opus.assetmanager.getImage("Grass"),
+                        layers[test],
+                        mapData.tilewidth,
+                        mapData.tileheight,
+                        mapData.width,
+                        mapData.height,
+                        1,
+                        mapData.tilesets[0].imagewidth,
+                        mapData.tilesets[0].imageheight
+                    ));
+                } else {
+                    opus.game.gameWorld.addElement(new opus.layer(
+                        opus.assetmanager.getImage("MainTileSet"),
+                        layers[test],
+                        mapData.tilewidth,
+                        mapData.tileheight,
+                        mapData.width,
+                        mapData.height,
+                        10,
+                        mapData.tilesets[1].imagewidth,
+                        mapData.tilesets[1].imageheight
+                    ));
                 }
+
+                test--;
             }
         };
 
