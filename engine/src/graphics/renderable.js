@@ -10,7 +10,7 @@
             // Extend this
         },
 
-        render: function() {
+        draw: function() {
             // Extend this
         }
     });

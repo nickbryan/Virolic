@@ -16,5 +16,6 @@
     "src/entity/blob.js",
     "src/system/assetmanager.js",
     "src/level/level.js",
-    "src/level/levelmanager.js"
+    "src/level/levelmanager.js",
+    "src/entity/entity.js"
 ]
