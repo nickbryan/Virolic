@@ -7,7 +7,8 @@
         },
 
         sort: function(a, b) {
-            /* alpha sort if (a.zIndex < b.zIndex) {
+            /* alpha sort
+            if (a.zIndex < b.zIndex) {
                 return -1;
             }
             if (a.zIndex > b.zIndex) {

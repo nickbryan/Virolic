@@ -1,4 +1,4 @@
-(function() {console.log("asdasd")
+(function() {
 
     opus.Entity = opus.Renderable.extend({
         init: function(x, y, width, height, name) {

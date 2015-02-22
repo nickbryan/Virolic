@@ -83,6 +83,7 @@
             frameIdBox.innerHTML = debugInfo.timeElapsed + 's';
         };
 
+        // Return to the global namespace
         return publicApi;
     })();
 })();

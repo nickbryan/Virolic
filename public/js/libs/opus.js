@@ -317,6 +317,7 @@
             frameIdBox.innerHTML = debugInfo.timeElapsed + 's';
         };
 
+        // Return to the global namespace
         return publicApi;
     })();
 })();
@@ -455,14 +456,53 @@
 })();
 (function() {
     opus.game = (function() {
+        /**
+         * Hold our public methods and parameters so we can return them
+         * to the namespace.
+         *
+         * @access private
+         * @type {object}
+         */
         var publicApi = {};
 
+        /**
+         * Lets us know if the game has been initialised or not.
+         *
+         * @access private
+         * @type {boolean}
+         */
         var initialised = false;
+
+        /**
+         * Width of the canvas screen.
+         *
+         * @access public
+         * @type {number}
+         */
         publicApi.screen_width = 0;
+
+        /**
+         * Height of the canvas screen.
+         *
+         * @access public
+         * @type {number}
+         */
         publicApi.screen_height = 0;
 
+        /**
+         * Our main game container.
+         *
+         * @access public
+         * @type {object}
+         */
         publicApi.gameWorld = null;
 
+        /**
+         * Initialise our game.
+         *
+         * @param width
+         * @param height
+         */
         publicApi.init = function (width, height) {
             publicApi.screen_width = width;
             publicApi.screen_height = height;
@@ -473,12 +513,20 @@
             }
         };
 
+        /**
+         * Update all entities in the game world container.
+         *
+         * @param time
+         */
         publicApi.update = function(time) {
             opus.timer.update(time);
 
             publicApi.gameWorld.update(time);
         };
 
+        /**
+         * Draw all entities and level stuff.
+         */
         publicApi.render = function() {
             opus.renderer.clearScreen();
 
@@ -487,6 +535,7 @@
             opus.renderer.drawFrontBuffer();
         };
 
+        // Return to the global namespace
         return publicApi;
     })();
 })();
@@ -544,8 +593,10 @@
 })();
 (function() {
     opus.Renderable = opus.Rectangle.extend({
-        init: function(xPos, yPos, width, height) {
+        init: function(xPos, yPos, width, height, type) {
             this.zIndex = NaN;
+
+            this.type = type;
 
             this._super(opus.Rectangle, 'init', [xPos, yPos, width, height]);
         },
@@ -635,7 +686,8 @@
         },
 
         sort: function(a, b) {
-            /* alpha sort if (a.zIndex < b.zIndex) {
+            /* alpha sort
+            if (a.zIndex < b.zIndex) {
                 return -1;
             }
             if (a.zIndex > b.zIndex) {
@@ -912,59 +964,73 @@
     };
 })();
 (function() {
-    opus.blob = opus.Renderable.extend({
-        init: function(x, y, width, height) {
-            this._super(opus.Renderable, "init", [x, y, width, height]);
-        },
-
-        draw: function(renderer) {
-            renderer.fillRect(this.position.x, this.position.y, this.width, this.height);
-        },
-
-        update: function(dt) {
-            if (opus.input.isKeyPressed("forward")) {
-                if (this.position.y > opus.game.gameWorld.position.y)
-                this.position.y--;
-            }
-            if (opus.input.isKeyPressed("left")) {
-                if (this.position.x > opus.game.gameWorld.position.x)
-                this.position.x--;
-            }
-            if (opus.input.isKeyPressed("down")) {
-                if (this.position.y < opus.game.gameWorld.height - this.height)
-                this.position.y++;
-            }
-            if (opus.input.isKeyPressed("right")) {
-                if (this.position.x < opus.game.gameWorld.width - this.width)
-                this.position.x++;
-            }
-        }
-    });
-})();
-(function() {
     opus.assetmanager = (function() {
+        /**
+         * Hold our public methods and parameters so we can return them
+         * to the namespace.
+         *
+         * @access private
+         * @type {object}
+         */
         var publicApi = {};
 
+        /**
+         * Holds all our cached images.
+         *
+         * @access private
+         * @type {object}
+         */
         var loadedImages = {};
+
+        /**
+         * Holds all our cached json files.
+         *
+         * @access private
+         * @type {{}}
+         */
         var loadedJSON = {};
 
+        /**
+         * Caches an image and loads it into the loadedImages container.
+         *
+         * @param name
+         * @param imageSource
+         */
         publicApi.loadImage = function (name, imageSource) {
             loadedImages[name] = new Image();
             loadedImages[name].src = imageSource;
         };
 
-        publicApi.loadedImages = function() {
+        /**
+         * Logs all loaded images to the console.
+         */
+        publicApi.logLoadedImages = function() {
             console.log(loadedImages);
         };
 
-        publicApi.getImage = function(image) {
-            if (image in loadedImages) {
-                return loadedImages[image];
+        /**
+         * Takes the name of the image and returns the image if found
+         * or null if no image was found.
+         *
+         * @param image
+         * @returns {*}
+         */
+        publicApi.getImage = function(imageName) {
+            if (imageName in loadedImages) {
+                return loadedImages[imageName];
             } else {
                 return null;
             }
         };
 
+
+        /**
+         * Caches a json file into a json string and loads it into the
+         * loadedJSON contianer.
+         *
+         * @param name
+         * @param imageSource
+         */
         publicApi.loadJSON = function (name, source) {
             var xmlhttp = new XMLHttpRequest();
 
@@ -995,6 +1061,12 @@
             xmlhttp.send(null);
         };
 
+        /**
+         * Gets the cached json string.
+         *
+         * @param json
+         * @returns {*}
+         */
         publicApi.getJSON = function(json) {
             if (json in loadedJSON) {
                 return loadedJSON[json];
@@ -1003,6 +1075,7 @@
             }
         };
 
+        // Return back to the global namespace
         return publicApi;
     })();
 })();
@@ -1070,31 +1143,45 @@
             layers = mapData.layers;
 
             var test = 0;
-            for (var i = 0; i < 4; i++) {
-                if (test == 0) {
-                    opus.game.gameWorld.addElement(new opus.layer(
-                        opus.assetmanager.getImage("Grass"),
-                        layers[i],
-                        mapData.tilewidth,
-                        mapData.tileheight,
-                        mapData.width,
-                        mapData.height,
-                        1,
-                        mapData.tilesets[0].imagewidth,
-                        mapData.tilesets[0].imageheight
-                    ));
+            for (var layer in layers) {
+                if (layers[layer].name == "Spawn") continue;
+
+                if (layers[layer].name == "Collisions") {
+                    for (var collisionObject in layers[layer].objects) {
+                        opus.game.gameWorld.addElement(new opus.Renderable(
+                            layers[layer].objects[collisionObject].x,
+                            layers[layer].objects[collisionObject].y,
+                            layers[layer].objects[collisionObject].width,
+                            layers[layer].objects[collisionObject].height,
+                            'collision'
+                        ));
+                    }
                 } else {
-                    opus.game.gameWorld.addElement(new opus.layer(
-                        opus.assetmanager.getImage("MainTileSet"),
-                        layers[i],
-                        mapData.tilewidth,
-                        mapData.tileheight,
-                        mapData.width,
-                        mapData.height,
-                        10,
-                        mapData.tilesets[1].imagewidth,
-                        mapData.tilesets[1].imageheight
-                    ));
+                    if (test == 0) {
+                        opus.game.gameWorld.addElement(new opus.layer(
+                            opus.assetmanager.getImage("Grass"),
+                            layers[layer],
+                            mapData.tilewidth,
+                            mapData.tileheight,
+                            mapData.width,
+                            mapData.height,
+                            1,
+                            mapData.tilesets[0].imagewidth,
+                            mapData.tilesets[0].imageheight
+                        ));
+                    } else {
+                        opus.game.gameWorld.addElement(new opus.layer(
+                            opus.assetmanager.getImage("MainTileSet"),
+                            layers[layer],
+                            mapData.tilewidth,
+                            mapData.tileheight,
+                            mapData.width,
+                            mapData.height,
+                            10,
+                            mapData.tilesets[1].imagewidth,
+                            mapData.tilesets[1].imageheight
+                        ));
+                    }
                 }
 
                 test++;
@@ -1104,7 +1191,7 @@
         return publicApi;
     })();
 })();
-(function() {console.log("asdasd")
+(function() {
 
     opus.Entity = opus.Renderable.extend({
         init: function(x, y, width, height, name) {
