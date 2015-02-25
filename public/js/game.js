@@ -59,21 +59,23 @@
                     y: this.position.y
                 };
 
+                console.log(opus.timer.tick);
+
                 if (opus.input.isKeyPressed("forward")) {
                     if (this.position.y > opus.game.gameWorld.position.y)
-                        this.position.y--;
+                        this.position.y -= 100 * opus.timer.tick;
                 }
                 if (opus.input.isKeyPressed("left")) {
                     if (this.position.x > opus.game.gameWorld.position.x)
-                        this.position.x--;
+                        this.position.x -= 100 * opus.timer.tick;
                 }
                 if (opus.input.isKeyPressed("down")) {
                     if (this.position.y < opus.game.gameWorld.height - this.height)
-                        this.position.y++;
+                        this.position.y += 100 * opus.timer.tick;
                 }
                 if (opus.input.isKeyPressed("right")) {
                     if (this.position.x < opus.game.gameWorld.width - this.width)
-                        this.position.x++;
+                        this.position.x += 100 * opus.timer.tick;
                 }
             } else {
                 this.position.y = this.oldPosition.y;

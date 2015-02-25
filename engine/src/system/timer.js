@@ -51,6 +51,9 @@
          */
         publicApi.fps = 0;
 
+        publicApi.tick = 1;
+        var step = Math.ceil(1000 / 60);
+
         /**
          * Initialise the timer and set defaults.
          */
@@ -124,6 +127,8 @@
 
             // DeltaTime is the time difference between the current and last frame
             deltaTime = (currentFrameTime - lastFrameTime);
+
+            publicApi.tick =  deltaTime / 1000;
 
             return deltaTime;
         };
