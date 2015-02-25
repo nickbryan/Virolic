@@ -41,7 +41,7 @@
         },
 
         multiplyScalar: function(value) {
-            return return new opus.vector2d(this.x * value, this.y * value);
+            return new opus.vector2d(this.x * value, this.y * value);
         },
 
         multiplyByScalar: function(value) {
@@ -51,7 +51,7 @@
         },
 
         divideScalar: function(value) {
-            return return new opus.vector2d(this.x / value, this.y / value);
+            return new opus.vector2d(this.x / value, this.y / value);
         },
 
         divideByScalar: function(value) {
