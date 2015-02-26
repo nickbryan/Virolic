@@ -45,8 +45,8 @@
         },
 
         multiplyByScalar: function(value) {
-            this.x * value;
-            this.y * value;
+            this.x *= value;
+            this.y *= value;
             return this;
         },
 
@@ -55,8 +55,8 @@
         },
 
         divideByScalar: function(value) {
-            this.x / value;
-            this.y / value;
+            this.x /= value;
+            this.y /= value;
             return this;
         },
 
