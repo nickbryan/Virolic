@@ -32,10 +32,17 @@
     game.Player = opus.Entity.extend({
         init: function(x, y, width, height, name) {
             this._super(opus.Entity, "init", [x, y, width, height, name]);
+
+            this.body.acceleration.set(1,1);
+            this.body.maxVelocity.set(1,1);
+            this.lastTime = opus.timer.getTimeElapsed();
+            this.lastPosition = new opus.vector2d();
+            this.lastPosition.x = this.position.x;
+            this.lastPosition.y = this.position.y;
         },
 
-        update: function(deltaTime) {
-            this._super(opus.Entity, "update", [deltaTime]);
+        update: function(time) {
+            this._super(opus.Entity, "update", [time]);
 
             this.isColliding = false;
             var container = opus.game.gameWorld.containedElements;
@@ -59,28 +66,41 @@
                     y: this.position.y
                 };
 
-                console.log(opus.timer.tick);
+                if ((opus.timer.getTimeElapsed() - this.lastTime) >= 1) {
+                    console.log(this.position.subtract(this.lastPosition));
+                    this.lastTime = opus.timer.getTimeElapsed();
+                    this.lastPosition.x = this.position.x;
+                    this.lastPosition.y = this.position.y;
+                }
 
                 if (opus.input.isKeyPressed("forward")) {
                     if (this.position.y > opus.game.gameWorld.position.y)
-                        this.position.y -= 100 * opus.timer.tick;
+                        this.body.velocity.y -= this.body.acceleration.y * opus.timer.tick;
+                } else if (opus.input.isKeyPressed("down")) {
+                    if (this.position.y < opus.game.gameWorld.height - this.height)
+                        this.body.velocity.y += this.body.acceleration.y * opus.timer.tick;
+                } else {
+                    this.body.velocity.y = 0;
                 }
+
                 if (opus.input.isKeyPressed("left")) {
                     if (this.position.x > opus.game.gameWorld.position.x)
-                        this.position.x -= 100 * opus.timer.tick;
-                }
-                if (opus.input.isKeyPressed("down")) {
-                    if (this.position.y < opus.game.gameWorld.height - this.height)
-                        this.position.y += 100 * opus.timer.tick;
-                }
-                if (opus.input.isKeyPressed("right")) {
+                        this.body.velocity.x -= this.body.acceleration.x * opus.timer.tick;
+                } else if (opus.input.isKeyPressed("right")) {
                     if (this.position.x < opus.game.gameWorld.width - this.width)
-                        this.position.x += 100 * opus.timer.tick;
+                        this.body.velocity.x += this.body.acceleration.x * opus.timer.tick;
+                } else {
+                    this.body.velocity.x = 0;
                 }
+
+
+
             } else {
                 this.position.y = this.oldPosition.y;
                 this.position.x = this.oldPosition.x;
             }
+
+            this.body.update(time);
         }
     });
 

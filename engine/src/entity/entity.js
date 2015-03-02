@@ -9,6 +9,8 @@
             this.name = name;
 
             this.alive = true;
+
+            this.body = new opus.PhysicsBody(this);
         },
 
         update: function(deltaTime) {

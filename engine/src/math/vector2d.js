@@ -78,6 +78,22 @@
 
         getLength: function() {
             return Math.sqrt((this.x * this.x) + (this.y * this.y));
+        },
+
+        invertX: function() {
+            this.x *= -1;
+            return this;
+        },
+
+        invertY: function() {
+            this.y *= -1;
+            return this;
+        },
+
+        invert: function() {
+            this.invertX();
+            this.invertY();
+            return this;
         }
     });
 })();

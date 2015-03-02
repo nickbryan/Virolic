@@ -222,4 +222,8 @@
     function _super(superClass, method, args) {
         return superClass.prototype[method].apply(this, args);
     };
+
+    Number.prototype.clamp = function (low, high) {
+        return this < low ? low : this > high ? high : +this;
+    };
 })();

@@ -17,5 +17,6 @@
     "src/system/assetmanager.js",
     "src/level/level.js",
     "src/level/levelmanager.js",
-    "src/entity/entity.js"
+    "src/entity/entity.js",
+    "src/physics/physicsbody.js"
 ]
